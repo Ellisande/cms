@@ -1,0 +1,15 @@
+{
+  "name": "light-cms",
+  "version": "1.0.0",
+  "description": "Light, markdown based CMS.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ellisande",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.12.2",
+    "marked": "^0.3.3"
+  }
+}
