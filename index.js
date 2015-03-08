@@ -33,7 +33,7 @@ fs.readFile("base_template.html", function(err, data){
   template = handlebars.compile(templateString);
 });
 
-exec('git submodule add https://github.com/ellisande/blog posts');
+exec('git submodule add --force https://github.com/ellisande/blog posts');
 var baseDir = "posts";
 var allPosts = fs.readdirSync(baseDir);
 var data = {
