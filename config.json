@@ -1,5 +1,6 @@
 {
-  "blog-name": "Justin's Blog",
-  "git-repository": "http://github.com/ellisande/blog",
-  "baseDir": "."
+  "blog_name": "Justin's Blog",
+  "git_repository": "http://github.com/ellisande/blog",
+  "base_tempalte": "static/base_template.html",
+  "post_template": "static/post_template.html"
 }

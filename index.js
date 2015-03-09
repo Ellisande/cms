@@ -5,6 +5,7 @@ var handlebars = require('handlebars');
 var fs = require('fs');
 var _ = require('lodash');
 require('shelljs/global');
+var config = require('./config.json');
 
 String.prototype.matches = function(regex){
   var result = this.match(regex);
@@ -34,16 +35,15 @@ fs.readFile("static/base_template.html", function(err, data){
   template = handlebars.compile(templateString);
 });
 
-exec('git submodule add --force https://github.com/ellisande/blog posts');
+exec('git submodule add --force ' + config.git_repository + ' posts');
 var baseDir = "posts";
-var allPosts = []
-var blog = {
-}
+var allPosts = [];
+var blog = {};
 
 app.use('/static', express.static(__dirname + '/static'));
 
 var refresh = function(req, res){
-  cd('posts');
+  cd(baseDir);
   exec('git pull')
   allPosts = fs.readdirSync("./");
 
@@ -64,12 +64,18 @@ var refresh = function(req, res){
 app.get('/refresh', refresh);
 
 app.get('/', function (req, res) {
-  var blogData = {posts: _.values(blog)};
+  var blogData = {
+    title: config.blog_name,
+    posts: _.values(blog)
+  };
   res.send(template(blogData));
 })
 
 app.get('/:blog', function(req, res){
-  var blogData = {posts: [blog[req.params.blog]]};
+  var blogData = {
+    title: req.params.blog,
+    posts: [blog[req.params.blog]]
+  };
   res.send(template(blogData));
 });
 
