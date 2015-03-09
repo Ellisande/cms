@@ -11,6 +11,7 @@
   "dependencies": {
     "express": "^4.12.2",
     "handlebars": "^3.0.0",
+    "lodash": "^3.4.0",
     "marked": "^0.3.3",
     "shelljs": "^0.3.0"
   }
