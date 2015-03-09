@@ -3,7 +3,6 @@ var app = express()
 var marked = require('marked');
 var handlebars = require('handlebars');
 var fs = require('fs');
-var _ = require('lodash');
 require('shelljs/global');
 var config = require('./config.json');
 var default_config = require('./default_config.json');
