@@ -3,6 +3,7 @@ var app = express()
 var marked = require('marked');
 var handlebars = require('handlebars');
 var fs = require('fs');
+var _ = require('lodash');
 require('shelljs/global');
 
 String.prototype.matches = function(regex){
@@ -28,43 +29,51 @@ marked.setOptions({
 
 var template;
 
-fs.readFile("base_template.html", function(err, data){
+fs.readFile("static/base_template.html", function(err, data){
   var templateString = "" + data;
   template = handlebars.compile(templateString);
 });
 
 exec('git submodule add --force https://github.com/ellisande/blog posts');
 var baseDir = "posts";
-var allPosts = fs.readdirSync(baseDir);
-var data = {
-  posts: []
+var allPosts = []
+var blog = {
 }
 
-app.get('/refresh', function(req, res){
+app.use('/static', express.static(__dirname + '/static'));
+
+var refresh = function(req, res){
   cd('posts');
   exec('git pull')
-  data.posts = [];
-  allPosts = fs.readdirSync(baseDir);
+  allPosts = fs.readdirSync("./");
 
   allPosts.forEach(function(post){
     if(post.matches(/^\..*/)) return;
-    var fileData = fs.readFileSync(baseDir + '/' + post);
+    var fileData = fs.readFileSync(post);
     var newPost = {
-      name: post,
+      name: post.replace('.md', ''),
       post: marked(""+fileData)
     }
-    data.posts.push(newPost);
+    blog[newPost.name] = newPost;
   });
 
   res.send("Refreshed");
   cd('..');
-});
+}
+
+app.get('/refresh', refresh);
 
 app.get('/', function (req, res) {
-  res.send(template(data));
+  var blogData = {posts: _.values(blog)};
+  res.send(template(blogData));
 })
 
+app.get('/:blog', function(req, res){
+  var blogData = {posts: [blog[req.params.blog]]};
+  res.send(template(blogData));
+});
 
+refresh({}, {send: function(){}});
 var server = app.listen(3000, function () {
 
   var host = server.address().address
