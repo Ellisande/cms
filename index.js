@@ -6,6 +6,7 @@ var fs = require('fs');
 var _ = require('lodash');
 require('shelljs/global');
 var config = require('./config.json');
+var default_config = require('./default_config.json');
 
 String.prototype.matches = function(regex){
   var result = this.match(regex);
@@ -28,11 +29,19 @@ marked.setOptions({
   smartypants: false
 });
 
-var template;
+var baseTemplate;
+var postTemplate;
+var baseTemplatePath = config.base_template || default_config.base_template;
+var postTemplatePath = config.post_template || default_config.post_template;
 
-fs.readFile("static/base_template.html", function(err, data){
+fs.readFile(baseTemplatePath, function(err, data){
   var templateString = "" + data;
-  template = handlebars.compile(templateString);
+  baseTemplate = handlebars.compile(templateString);
+});
+
+fs.readFile(postTemplatePath, function(err, data){
+  var templateString = "" + data;
+  postTemplate = handlebars.compile(templateString);
 });
 
 exec('git submodule add --force ' + config.git_repository + ' posts');
@@ -68,7 +77,7 @@ app.get('/', function (req, res) {
     title: config.blog_name,
     posts: _.values(blog)
   };
-  res.send(template(blogData));
+  res.send(baseTemplate(blogData));
 })
 
 app.get('/:blog', function(req, res){
@@ -76,10 +85,12 @@ app.get('/:blog', function(req, res){
     title: req.params.blog,
     posts: [blog[req.params.blog]]
   };
-  res.send(template(blogData));
+  res.send(postTemplate(blogData));
 });
 
 refresh({}, {send: function(){}});
+
+
 var server = app.listen(3000, function () {
 
   var host = server.address().address
